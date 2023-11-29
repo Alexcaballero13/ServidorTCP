@@ -1,0 +1,29 @@
+version: '3.9'
+volumes:
+  postgis-data:
+services:
+  sockettcp:
+    container_name: sockettcp
+    restart: always
+    build: ./server/.
+    ports:
+      - 4000:4000
+    depends_on:
+      - db
+    volumes:
+    - ./server/.:/usr/src/app
+  db:
+    container_name: dbpostgres
+    image: kartoza/postgis:15-3.3
+    volumes:
+      - postgis-data:/var/lib/postgresql
+    environment:
+      - POSTGRES_DB=dispositivos
+      - POSTGRES_USER=dispositivos
+      - POSTGRES_PASS=!dispositivos2023
+      - ALLOW_IP_RANGE=0.0.0.0/0
+      - POSTGRES_MULTIPLE_EXTENSIONS=postgis,hstore,postgis_topology,postgis_raster,pgrouting
+      - RUN_AS_ROOT=true
+    ports:
+      - 5433:5432
+    restart: on-failure
